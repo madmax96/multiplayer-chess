@@ -1,12 +1,8 @@
 {
     "test": {
-      "PORT": 3030,
-      "MONGODB_URI": "",
-      "JWT_SECRET": ""
+      "PORT": 3030
     },
     "development": {
-      "PORT": 3000,
-      "MONGODB_URI": "mongodb://madmax:madmax@ds249079.mlab.com:49079/multiplayerchess",
-      "JWT_SECRET": "65s4dfs65d4fsf"
+      "PORT": 3000
     }
   }

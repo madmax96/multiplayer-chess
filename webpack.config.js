@@ -3,11 +3,11 @@
 const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-const css = new ExtractTextPlugin({filename:'style.sdfsdfsdf.css'});
+const css = new ExtractTextPlugin('style.css');
 module.exports = (env) => {
   const isProduction = env === 'production';
   return {
-    entry: ['babel-polyfill', './App/app.js'],
+    entry: ['babel-polyfill', './App/app.jsx'],
     output: {
       path: path.join(__dirname, 'public'),
       filename: 'bundle.js',
@@ -15,11 +15,11 @@ module.exports = (env) => {
     module: {
       rules: [{
         loader: 'babel-loader',
-        test: /\.js$/,
+        test: /\.jsx?$/,
         exclude: /node_modules/,
       },
       {
-        test: /\.scss$/,
+        test: /\.s?css$/,
         use: css.extract({
           use: [
             {
@@ -34,6 +34,9 @@ module.exports = (env) => {
         }),
       },
       ],
+    },
+    resolve: {
+      extensions: ['.js', '.jsx'],
     },
     plugins: [css],
     devtool: isProduction ? 'source-map' : 'inline-source-map',
