@@ -6,6 +6,7 @@ class CustomEvents {
   on(event, callback) {
     this.registeredEvents[event] = callback;
   }
+
   eventHandler(message, ws, wss) {
     const messageObj = JSON.parse(message);
     const handler = this.registeredEvents[messageObj.event];

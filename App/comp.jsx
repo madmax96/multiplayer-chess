@@ -23,6 +23,8 @@ class Test extends React.Component {
   }
 
   toggle() {
+    const obj = { a: 'a' };
+    console.log({ ...obj });
     this.setState(prevState => ({
       dropdownOpen: !prevState.dropdownOpen,
     }));
@@ -40,7 +42,7 @@ class Test extends React.Component {
           </DropdownToggle>
           <DropdownMenu>
             <DropdownItem header>
-                Header
+                Header test
             </DropdownItem>
             <DropdownItem disabled>
                 Action

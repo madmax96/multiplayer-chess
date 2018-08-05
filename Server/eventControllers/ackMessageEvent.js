@@ -7,26 +7,20 @@
 module.exports = (data, ws, wss) => {
   const { timestamp } = data;
   const room = wss.gameRooms[ws.roomId];
-  const playerSending = room[ws.isWhite ? 'white' : 'black'];
+  const playerSending = room[ws.figure];
 
-  const winner = ws.isWhite ? 'black' : 'white';
+  const winner = ws.figure ? 0 : 1; // if time expires for current player we have a winner
 
   playerSending.lastAck = timestamp;
-  playerSending.tempRemainingTime = playerSending.timeRemaining;
-  playerSending.timer = setInterval(() => {
-    playerSending.tempRemainingTime -= 1000;
-    if (playerSending.tempRemainingTime <= 0) {
-      clearInterval(playerSending.timer);
-      playerSending.timer = null;
-      room.white.socket.send(JSON.stringify({
-        event: 'winner',
-        data: { winner },
-      }));
-      room.black.socket.send(JSON.stringify({
-        event: 'winner',
-        data: { winner },
-      }));
-    }
-  }, 1000);
+  playerSending.timer = setTimeout(() => {
+    playerSending.timer = null;
+    room[1].socket.send(JSON.stringify({
+      event: 'winner',
+      data: { winner },
+    }));
+    room[0].socket.send(JSON.stringify({
+      event: 'winner',
+      data: { winner },
+    }));
+  }, playerSending.timeRemaining);
 };
-

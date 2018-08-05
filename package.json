@@ -4,9 +4,8 @@
   "description": "Multiplayer chess game built with react ,node and websockets",
   "main": "index.js",
   "scripts": {
-    "s": "parcel public/index.html",
-    "test-server": "export NODE_ENV=test || SET \"NODE_ENV=test\" && mocha Server/test/index.test.js",
-    "test-debug": "export NODE_ENV=test || SET \"NODE_ENV=test\" && mocha debug Server/test/index.test.js"
+    "front": "parcel public/index.html",
+    "back" : "node Server/server.js"
   },
   "repository": {
     "type": "git",

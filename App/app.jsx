@@ -15,7 +15,7 @@ ws.connect('user').then(() => {
       <Container>
         <Row>
           <Col sm="3">
-            Connectedd
+            Connect
           </Col>
           <Col sm="6">
             <Test />
