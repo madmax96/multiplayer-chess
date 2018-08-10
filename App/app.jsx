@@ -1,39 +1,70 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import styled from 'styled-components';
 import 'normalize.css/normalize.css';
 import 'bootstrap/dist/css/bootstrap.css';
-import { Row, Col, Container } from 'reactstrap';
-import classes from './test.css';
-// import sClasses from './Styles/index.scss';
+import image from '../public/background.jpeg';
 import WSocket from './utils/ws';
-import Test from './comp';
 
-const ws = new WSocket('ws://localhost:3000');
-ws.connect('user').then(() => {
-  ReactDOM.render(
-    (
-      <Container>
-        <Row>
-          <Col sm="3">
-            Connect
-          </Col>
-          <Col sm="6">
-            <Test />
-          </Col>
-        </Row>
-      </Container>
-    ), document.getElementById('app'),
-  );
 
-  ws.on('ws_close', () => {
-    console.log('closed');
+function connect() {
+  const ws = new WSocket('ws://localhost:3000');
+  ws.connect('user').then(() => {
+    alert('connected');
+    ws.on('ws_close', () => {
+      console.log('closed');
+    });
+  }).catch((err) => {
+    console.log(err);
   });
-}).catch((err) => {
-  console.log(err);
-});
+}
+const FixedBackground = styled.div`
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100vh;
+  background:url(${image});
+  background-size:cover;
+  background-repeat:no-repeat;
+  background-position:center center;
+  &:after{
+    content:'';
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100vh;
+    background-color:rgba(0,0,0,.75);
+  }
+`;
+
+const StartForm = styled.div`
+  position: absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:30%;
+  height:30vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+`;
+
 ReactDOM.render(
   (
-    <p className={classes.testing}>
-      Testing
-    </p>), document.getElementById('app'),
+    <div>
+      <FixedBackground />
+      <StartForm>
+        <h4>
+          Type your username and start playing now
+        </h4>
+        <input type="text" />
+        <button type="button" onClick={connect}>
+          Play
+        </button>
+      </StartForm>
+    </div>
+  ), document.getElementById('app'),
 );
