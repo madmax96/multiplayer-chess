@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "front": "parcel public/index.html",
-    "back" : "node Server/server.js"
+    "back": "node Server/server.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +22,7 @@
     "bootstrap": "^4.1.3",
     "express": "^4.16.3",
     "normalize.css": "^8.0.0",
+    "prop-types": "^15.6.2",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-router-dom": "^4.3.1",

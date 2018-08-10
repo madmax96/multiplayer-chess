@@ -2,22 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import 'normalize.css/normalize.css';
-import 'bootstrap/dist/css/bootstrap.css';
 import image from '../public/background.jpeg';
-import WSocket from './utils/ws';
+import WS from './utils/ws';
+import StartGameForm from './components/StartGame';
+import Game from './components/Game';
 
-
-function connect() {
-  const ws = new WSocket('ws://localhost:3000');
-  ws.connect('user').then(() => {
-    alert('connected');
-    ws.on('ws_close', () => {
-      console.log('closed');
-    });
-  }).catch((err) => {
-    console.log(err);
-  });
-}
 const FixedBackground = styled.div`
   position:fixed;
   top:0;
@@ -28,6 +17,8 @@ const FixedBackground = styled.div`
   background-size:cover;
   background-repeat:no-repeat;
   background-position:center center;
+  overflow:hidden;
+  z-index:-1000;
   &:after{
     content:'';
     position:absolute;
@@ -35,36 +26,49 @@ const FixedBackground = styled.div`
     left:0;
     width:100%;
     height:100vh;
-    background-color:rgba(0,0,0,.75);
+    background-color:rgba(0,0,0,.45);
   }
 `;
+class App extends React.Component {
+  constructor(props) {
+    super(props);
 
-const StartForm = styled.div`
-  position: absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  width:30%;
-  height:30vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-`;
+    this.state = {
+      gameStarted: false,
+    };
+    this.connect = this.connect.bind(this);
+  }
+
+  connect(username) {
+    this.ws = new WS('ws://localhost:3000');
+    this.ws.connect(username).then(() => {
+      this.setState({
+        gameStarted: true,
+      });
+      this.ws.on('ws_close', () => {
+        alert('closed');
+      });
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
+
+  render() {
+    return (
+      <div>
+        <FixedBackground />
+        {this.state.gameStarted ? (
+          <Game />
+        ) : <StartGameForm connect={this.connect} />}
+
+      </div>
+    );
+  }
+}
+
 
 ReactDOM.render(
   (
-    <div>
-      <FixedBackground />
-      <StartForm>
-        <h4>
-          Type your username and start playing now
-        </h4>
-        <input type="text" />
-        <button type="button" onClick={connect}>
-          Play
-        </button>
-      </StartForm>
-    </div>
+    <App />
   ), document.getElementById('app'),
 );
