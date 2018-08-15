@@ -1,79 +1,99 @@
 import React from 'react';
-import styled from 'styled-components';
 import PropTypes from 'prop-types';
-
 import {
   Figure, Rook, King, Queen, Pawn, Knight, Bishop, Icons,
 } from './Figures/Figures';
 
+import { BoardField, BoardLayout, FiguresGrid } from './StyledComponents';
+
 const HIGHILGHT_TYPES = {
   info: 'rgba(0, 123, 255,.5)',
 };
-const BoardLayout = styled.div`
-    position: absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    width:600px;
-    height:600px;
-    display: flex;
-    flex-wrap:wrap;
-    border:8px solid black;
-`;
-const FiguresGrid = styled.div`
-    position: absolute;
-    top:0;
-    left:0;
-    transform:${props => (props.rotate ? 'rotate(180deg)' : '')};
-    width:100%;
-    height:100%;
-    display: flex;
-    flex-wrap:wrap;
-`;
-const BoardField = styled.div`
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background-color: ${props => (props.fieldColor)};
-  flex:0 0 12.5%;
-  height:12.5%;
-  cursor: ${props => (props.cursor)};
-`;
+
 class Board extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       boardState: [
-        ['r0', 'kn0', 'b0', 'q0', 'k0', 'b0', 'kn0', 'r0'],
-        ['p0', 'p0', 'p0', 'p0', 'p0', 'p0', 'p0', 'p0'],
+        ['r-0', 'kn-0', 'b-0', 'q-0', 'k-0', 'b-0', 'kn-0', 'r-0'],
+        ['p-0', 'p-0', 'p-0', 'p-0', 'p-0', 'p-0', 'p-0', 'p-0'],
         ['', '', '', '', '', '', '', ''],
         ['', '', '', '', '', '', '', ''],
         ['', '', '', '', '', '', '', ''],
         ['', '', '', '', '', '', '', ''],
-        ['p1', 'p1', 'p1', 'p1', 'p1', 'p1', 'p1', 'p1'],
-        ['r1', 'kn1', 'b1', 'q1', 'k1', 'b1', 'kn1', 'r1'],
+        ['p-1', 'p-1', 'p-1', 'p-1', 'p-1', 'p-1', 'p-1', 'p-1'],
+        ['r-1', 'kn-1', 'b-1', 'q-1', 'k-1', 'b-1', 'kn-1', 'r-1'],
       ],
       highlight: {
-        selected: '00',
-        available: ['11'],
-
+        selected: '',
+        available: [],
       },
     };
+    this.highlightPosibleMoves = this.highlightPosibleMoves.bind(this);
+    this.handleMove = this.handleMove.bind(this);
+    this.figuresMap = {
+      p: (i, j, rotate) => <Pawn icon={Icons[`p${props.figure}`]} rotate={rotate} onClick={this.highlightPosibleMoves} position={[i, j]} />,
+      r: (i, j, rotate) => <Rook icon={Icons[`r${props.figure}`]} rotate={rotate} onClick={this.highlightPosibleMoves} position={[i, j]} />,
+      k: (i, j, rotate) => <King icon={Icons[`k${props.figure}`]} rotate={rotate} onClick={this.highlightPosibleMoves} position={[i, j]} />,
+      q: (i, j, rotate) => <Queen icon={Icons[`q${props.figure}`]} rotate={rotate} onClick={this.highlightPosibleMoves} position={[i, j]} />,
+      kn: (i, j, rotate) => <Knight icon={Icons[`kn${props.figure}`]} rotate={rotate} onClick={this.highlightPosibleMoves} position={[i, j]} />,
+      b: (i, j, rotate) => <Bishop icon={Icons[`b${props.figure}`]} rotate={rotate} onClick={this.highlightPosibleMoves} position={[i, j]} />,
+    };
+  }
+
+  handleMove([k, l]) {
+    let [i, j] = this.state.highlight.selected;
+    i = +i;
+    j = +j;
+    this.setState((prevState) => {
+      const newBoard = prevState.boardState.map(row => row.slice());
+      newBoard[k][l] = newBoard[i][j];
+      newBoard[i][j] = '';
+      return {
+        boardState: newBoard,
+        highlight: { selected: '', available: [] },
+      };
+    });
+  }
+
+  highlightPosibleMoves(fieldsToTest, [i, j]) {
+    this.setState(
+      prevState => ({
+        highlight: {
+          ...prevState.highlight,
+          selected: `${i}${j}`,
+          available: fieldsToTest,
+        },
+      }),
+    );
   }
 
   render() {
     const fields = [];
     this.state.boardState.forEach((row, i) => row.forEach((figure, j) => {
-      if (figure.includes(this.props.figure)) {
+      const [figureType, figureColor] = figure.split('-');
+      let fieldColor;
+      if (this.state.highlight.selected === `${i}${j}`) {
+        fieldColor = 'rgba(23, 162, 184,.85)';
+      } else if (this.state.highlight.available.includes(`${i}${j}`)) {
+        fieldColor = 'rgba(40, 167, 69,.65)';
+      } else {
+        fieldColor = 'transparent';
+      }
+      if (figureColor == this.props.figure) {
         // my figures
         fields.push((
-          <BoardField>
-            <Figure icon={Icons.queenW} onclick={() => window.alert('kurcina')} />
+          <BoardField fieldColor={fieldColor}>
+            {this.figuresMap[figureType](i, j, this.props.figure == 0)}
           </BoardField>));
       } else {
+        let moveHandler;
+        if (this.state.highlight.available.includes(`${i}${j}`)) {
+          moveHandler = () => this.handleMove([i, j]);
+        }
         fields.push((
-          <BoardField>
-            <Figure icon={Icons.queenB} />
+          <BoardField fieldColor={fieldColor}>
+            <Figure rotate={this.props.figure == 0} icon={Icons[`${figureType}${figureColor}`]} onClick={moveHandler} />
           </BoardField>));
       }
     }));
@@ -84,7 +104,7 @@ class Board extends React.Component {
             fieldColor={(i + j) % 2 === 0 ? 'white' : 'black'}
           />
         )))}
-        <FiguresGrid>
+        <FiguresGrid rotate={this.props.figure == 0}>
           {fields}
         </FiguresGrid>
       </BoardLayout>

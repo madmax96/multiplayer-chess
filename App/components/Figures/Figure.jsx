@@ -1,16 +1,17 @@
 import React from 'react';
-import styled from 'styled-components';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
+import { FigureIMG } from '../StyledComponents';
 
-const FigureIMG = styled.img`
-    width:auto;
-    height:90%;
-    transition:'transform' .2s;
-    &:hover{
-      transform:scale(1.15);
-    }
+const FigureWrap = styled.div`
+  width:100%;
+  height:100%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  transform:${props => (props.rotate ? 'rotate(180deg)' : '')};
 `;
-
 class Figure extends React.Component {
   constructor(props) {
     super(props);
@@ -19,7 +20,9 @@ class Figure extends React.Component {
 
   render() {
     return (
-      <FigureIMG src={this.props.icon} alt="" onClick={this.props.onclick} />
+      <FigureWrap onClick={this.props.onClick} rotate={this.props.rotate}>
+        <FigureIMG src={this.props.icon} alt="" />
+      </FigureWrap>
     );
   }
 }
