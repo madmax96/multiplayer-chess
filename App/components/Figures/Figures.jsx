@@ -6,23 +6,23 @@ import Knight from './Knight';
 import Queen from './Queen';
 import Bishop from './Bishop';
 
-import b0 from '../../../public/figures/bishopB.png';
-import b1 from '../../../public/figures/bishopW.png';
-import k0 from '../../../public/figures/kingB.png';
-import k1 from '../../../public/figures/kingW.png';
-import p0 from '../../../public/figures/pawnB.png';
-import p1 from '../../../public/figures/pawnW.png';
-import kn0 from '../../../public/figures/knightB.png';
-import kn1 from '../../../public/figures/knightW.png';
-import q1 from '../../../public/figures/queenW.png';
-import q0 from '../../../public/figures/queenB.png';
-import r1 from '../../../public/figures/rookW.png';
-import r0 from '../../../public/figures/rookB.png';
+import b from '../../../public/figures/bishopB.png';
+import B from '../../../public/figures/bishopW.png';
+import k from '../../../public/figures/kingB.png';
+import K from '../../../public/figures/kingW.png';
+import p from '../../../public/figures/pawnB.png';
+import P from '../../../public/figures/pawnW.png';
+import n from '../../../public/figures/knightB.png';
+import N from '../../../public/figures/knightW.png';
+import Q from '../../../public/figures/queenW.png';
+import q from '../../../public/figures/queenB.png';
+import R from '../../../public/figures/rookW.png';
+import r from '../../../public/figures/rookB.png';
 
 const Icons = {
-  b0, b1, k0, k1, p0, p1, kn0, kn1, q1, q0, r1, r0,
-
+  b, B, k, K, p, P, n, N, Q, q, R, r,
 };
+
 export {
   Figure, Rook, King, Queen, Pawn, Knight, Bishop,
   Icons,

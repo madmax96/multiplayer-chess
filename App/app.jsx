@@ -34,7 +34,7 @@ class App extends React.Component {
     super(props);
 
     this.state = {
-      gameStarted: false,
+      gameStarted: true,
     };
     this.connect = this.connect.bind(this);
   }

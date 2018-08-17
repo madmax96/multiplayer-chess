@@ -27,7 +27,8 @@ class Figure extends React.Component {
   }
 }
 Figure.propTypes = {
-  icon: PropTypes.string.isRequired,
+  icon: PropTypes.string,
   onClick: PropTypes.func,
+  rotate: PropTypes.bool,
 };
 export default Figure;

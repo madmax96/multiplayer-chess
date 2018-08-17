@@ -4,110 +4,179 @@ import {
   Figure, Rook, King, Queen, Pawn, Knight, Bishop, Icons,
 } from './Figures/Figures';
 
-import { BoardField, BoardLayout, FiguresGrid } from './StyledComponents';
-
-const HIGHILGHT_TYPES = {
-  info: 'rgba(0, 123, 255,.5)',
-};
+import { BoardField, FiguresGrid } from './StyledComponents';
 
 class Board extends React.Component {
   constructor(props) {
     super(props);
+    this.isWhite = props.figure === 1;
     this.state = {
       boardState: [
-        ['r-0', 'kn-0', 'b-0', 'q-0', 'k-0', 'b-0', 'kn-0', 'r-0'],
-        ['p-0', 'p-0', 'p-0', 'p-0', 'p-0', 'p-0', 'p-0', 'p-0'],
-        ['', '', '', '', '', '', '', ''],
-        ['', '', '', '', '', '', '', ''],
-        ['', '', '', '', '', '', '', ''],
-        ['', '', '', '', '', '', '', ''],
-        ['p-1', 'p-1', 'p-1', 'p-1', 'p-1', 'p-1', 'p-1', 'p-1'],
-        ['r-1', 'kn-1', 'b-1', 'q-1', 'k-1', 'b-1', 'kn-1', 'r-1'],
+        'r@00', 'n@01', 'b@02', 'q@03', 'k@04', 'b@05', 'n@06', 'r@07',
+        'p@10', 'p@11', 'p@12', 'p@13', 'p@14', 'p@15', 'p@16', 'p@17',
+        'P@60', 'P@61', 'P@62', 'P@63', 'P@64', 'P@65', 'P@66', 'P@67',
+        'R@70', 'N@71', 'B@72', 'Q@73', 'K@74', 'B@75', 'N@76', 'R@77',
       ],
-      highlight: {
-        selected: '',
-        available: [],
-      },
+      selected: '',
+      validMoves: {},
+
     };
     this.highlightPosibleMoves = this.highlightPosibleMoves.bind(this);
     this.handleMove = this.handleMove.bind(this);
     this.figuresMap = {
-      p: (i, j, rotate) => <Pawn icon={Icons[`p${props.figure}`]} rotate={rotate} onClick={this.highlightPosibleMoves} position={[i, j]} />,
-      r: (i, j, rotate) => <Rook icon={Icons[`r${props.figure}`]} rotate={rotate} onClick={this.highlightPosibleMoves} position={[i, j]} />,
-      k: (i, j, rotate) => <King icon={Icons[`k${props.figure}`]} rotate={rotate} onClick={this.highlightPosibleMoves} position={[i, j]} />,
-      q: (i, j, rotate) => <Queen icon={Icons[`q${props.figure}`]} rotate={rotate} onClick={this.highlightPosibleMoves} position={[i, j]} />,
-      kn: (i, j, rotate) => <Knight icon={Icons[`kn${props.figure}`]} rotate={rotate} onClick={this.highlightPosibleMoves} position={[i, j]} />,
-      b: (i, j, rotate) => <Bishop icon={Icons[`b${props.figure}`]} rotate={rotate} onClick={this.highlightPosibleMoves} position={[i, j]} />,
+      p: (position, rotate, icon, board) => (
+        <Pawn
+          board={board}
+          icon={icon}
+          rotate={rotate}
+          onClick={this.highlightPosibleMoves}
+          position={position}
+        />
+      ),
+      r: (position, rotate, icon, board) => (
+        <Rook
+          board={board}
+          icon={icon}
+          rotate={rotate}
+          onClick={this.highlightPosibleMoves}
+          position={position}
+        />
+      ),
+      k: (position, rotate, icon, board) => (
+        <King
+          board={board}
+          icon={icon}
+          rotate={rotate}
+          onClick={this.highlightPosibleMoves}
+          position={position}
+        />
+      ),
+      q: (position, rotate, icon, board) => (
+        <Queen
+          board={board}
+          icon={icon}
+          rotate={rotate}
+          onClick={this.highlightPosibleMoves}
+          position={position}
+        />
+      ),
+      n: (position, rotate, icon, board) => (
+        <Knight
+          board={board}
+          icon={icon}
+          rotate={rotate}
+          onClick={this.highlightPosibleMoves}
+          position={position}
+        />
+      ),
+      b: (position, rotate, icon, board) => (
+        <Bishop
+          board={board}
+          icon={icon}
+          rotate={rotate}
+          onClick={this.highlightPosibleMoves}
+          position={position}
+        />
+      ),
     };
   }
 
-  handleMove([k, l]) {
-    let [i, j] = this.state.highlight.selected;
-    i = +i;
-    j = +j;
+  onFigureEat(newPositon) {
+    // do logic for eating
+    this.handleMove(newPositon);
+  }
+
+  handleMove(newPosition) {
+    let selectedFigure;
+
     this.setState((prevState) => {
-      const newBoard = prevState.boardState.map(row => row.slice());
-      newBoard[k][l] = newBoard[i][j];
-      newBoard[i][j] = '';
+      const { selected } = prevState;
+      const newBoard = prevState.boardState.filter((field) => {
+        const [figureType, fieldPosition] = field.split('@');
+        if (selected === fieldPosition) {
+          selectedFigure = figureType;
+          return false;
+        }
+        return fieldPosition !== newPosition;
+      });
+
+      newBoard.push(`${selectedFigure}@${newPosition}`);
       return {
+        selected: '',
+        validMoves: {},
         boardState: newBoard,
-        highlight: { selected: '', available: [] },
       };
     });
   }
 
-  highlightPosibleMoves(fieldsToTest, [i, j]) {
+
+  highlightPosibleMoves(validMoves, selected) {
     this.setState(
-      prevState => ({
-        highlight: {
-          ...prevState.highlight,
-          selected: `${i}${j}`,
-          available: fieldsToTest,
-        },
-      }),
+      {
+        validMoves,
+        selected,
+      },
     );
   }
 
   render() {
     const fields = [];
-    this.state.boardState.forEach((row, i) => row.forEach((figure, j) => {
-      const [figureType, figureColor] = figure.split('-');
+    this.state.boardState.forEach((field) => {
+      const [figureType, fieldPosition] = field.split('@');
       let fieldColor;
-      if (this.state.highlight.selected === `${i}${j}`) {
+      if (this.state.selected === fieldPosition) {
         fieldColor = 'rgba(23, 162, 184,.85)';
-      } else if (this.state.highlight.available.includes(`${i}${j}`)) {
+      } else if (this.state.validMoves[fieldPosition]) {
         fieldColor = 'rgba(40, 167, 69,.65)';
       } else {
         fieldColor = 'transparent';
       }
-      if (figureColor == this.props.figure) {
+      let [i, j] = fieldPosition;
+      i = +i;
+      j = +j;
+      const index = i * 8 + j;
+
+      if ((this.isWhite && figureType.toUpperCase() === figureType)
+       || ((!this.isWhite && figureType.toLowerCase() === figureType))) {
         // my figures
-        fields.push((
-          <BoardField fieldColor={fieldColor}>
-            {this.figuresMap[figureType](i, j, this.props.figure == 0)}
-          </BoardField>));
+        fields[index] = (
+          <BoardField fieldColor={fieldColor} key={`${i}${j}`}>
+            {this.figuresMap[figureType.toLowerCase()](fieldPosition,
+              !this.isWhite, Icons[figureType], this.state.boardState)}
+          </BoardField>);
       } else {
-        let moveHandler;
-        if (this.state.highlight.available.includes(`${i}${j}`)) {
-          moveHandler = () => this.handleMove([i, j]);
+        let eatFigureHandler;
+        if (this.state.validMoves[fieldPosition]) {
+          fieldColor = 'red';
+          eatFigureHandler = () => this.onFigureEat(fieldPosition);
         }
-        fields.push((
-          <BoardField fieldColor={fieldColor}>
-            <Figure rotate={this.props.figure == 0} icon={Icons[`${figureType}${figureColor}`]} onClick={moveHandler} />
-          </BoardField>));
+        fields[index] = (
+          <BoardField fieldColor={fieldColor} key={`${i}${j}`}>
+            <Figure rotate={!this.isWhite} icon={Icons[figureType]} onClick={eatFigureHandler} />
+          </BoardField>);
       }
-    }));
+    });
+
+    for (let i = 0; i < 64; i++) {
+      if (fields[i] == null) {
+        // empty fields
+        const position = `${Math.trunc(i / 8)}${i % 8}`;
+        let field = <BoardField key={position} />;
+        if (this.state.validMoves[position]) {
+          field = (
+            <BoardField fieldColor="rgba(40, 167, 69,.65)" key={position}>
+              <Figure onClick={() => this.handleMove(position)} />
+
+            </BoardField>
+          );
+        }
+        fields[i] = field;
+      }
+    }
     return (
-      <BoardLayout>
-        {this.state.boardState.map((row, i) => row.map((figure, j) => (
-          <BoardField
-            fieldColor={(i + j) % 2 === 0 ? 'white' : 'black'}
-          />
-        )))}
-        <FiguresGrid rotate={this.props.figure == 0}>
-          {fields}
-        </FiguresGrid>
-      </BoardLayout>
+      <FiguresGrid rotate={!this.isWhite}>
+        { fields }
+      </FiguresGrid>
     );
   }
 }

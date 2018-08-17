@@ -1,14 +1,12 @@
 import styled from 'styled-components';
 
-const BoardLayout = styled.div`
+const BoardWrapper = styled.div`
     position: absolute;
     top:50%;
     left:50%;
     transform:translate(-50%,-50%);
     width:600px;
     height:600px;
-    display: flex;
-    flex-wrap:wrap;
     border:8px solid black;
 `;
 const FiguresGrid = styled.div`
@@ -21,6 +19,7 @@ const FiguresGrid = styled.div`
     display: flex;
     flex-wrap:wrap;
 `;
+
 const BoardField = styled.div`
   display:flex;
   align-items:center;
@@ -37,10 +36,10 @@ const FigureIMG = styled.img`
     &:hover{
       transform:scale(1.15);
     }
-    cursor:pointer
+    cursor:pointer;
 `;
 
 
 export {
-  BoardLayout, BoardField, FiguresGrid, FigureIMG,
+  BoardWrapper, BoardField, FiguresGrid, FigureIMG,
 };
