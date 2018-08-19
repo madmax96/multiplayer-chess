@@ -58,9 +58,8 @@ class App extends React.Component {
       <div>
         <FixedBackground />
         {this.state.gameStarted ? (
-          <Game figure={1} />
+          <Game isWhite />
         ) : <StartGameForm connect={this.connect} />}
-
       </div>
     );
   }

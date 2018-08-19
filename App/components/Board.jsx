@@ -9,14 +9,41 @@ import { BoardField, FiguresGrid } from './StyledComponents';
 class Board extends React.Component {
   constructor(props) {
     super(props);
-    this.isWhite = props.figure === 1;
     this.state = {
-      boardState: [
-        'r@00', 'n@01', 'b@02', 'q@03', 'k@04', 'b@05', 'n@06', 'r@07',
-        'p@10', 'p@11', 'p@12', 'p@13', 'p@14', 'p@15', 'p@16', 'p@17',
-        'P@60', 'P@61', 'P@62', 'P@63', 'P@64', 'P@65', 'P@66', 'P@67',
-        'R@70', 'N@71', 'B@72', 'Q@73', 'K@74', 'B@75', 'N@76', 'R@77',
-      ],
+      boardState: {
+        '00': 'r',
+        '01': 'n',
+        '02': 'b',
+        '03': 'q',
+        '04': 'k',
+        '05': 'b',
+        '06': 'n',
+        '07': 'r',
+        '10': 'p',
+        '11': 'p',
+        '12': 'p',
+        '13': 'p',
+        '14': 'p',
+        '15': 'p',
+        '16': 'p',
+        '17': 'p',
+        '60': 'P',
+        '61': 'P',
+        '62': 'P',
+        '63': 'P',
+        '64': 'P',
+        '65': 'P',
+        '66': 'P',
+        '67': 'P',
+        '70': 'R',
+        '71': 'N',
+        '72': 'B',
+        '73': 'Q',
+        '74': 'K',
+        '75': 'B',
+        '76': 'N',
+        '77': 'R',
+      },
       selected: '',
       validMoves: {},
 
@@ -24,56 +51,56 @@ class Board extends React.Component {
     this.highlightPosibleMoves = this.highlightPosibleMoves.bind(this);
     this.handleMove = this.handleMove.bind(this);
     this.figuresMap = {
-      p: (position, rotate, icon, board) => (
+      p: position => (
         <Pawn
-          board={board}
-          icon={icon}
-          rotate={rotate}
+          board={this.state.boardState}
+          icon={Icons[props.isWhite ? 'P' : 'p']}
+          isWhite={props.isWhite}
           onClick={this.highlightPosibleMoves}
           position={position}
         />
       ),
-      r: (position, rotate, icon, board) => (
+      r: position => (
         <Rook
-          board={board}
-          icon={icon}
-          rotate={rotate}
+          board={this.state.boardState}
+          icon={Icons[props.isWhite ? 'R' : 'r']}
+          isWhite={props.isWhite}
           onClick={this.highlightPosibleMoves}
           position={position}
         />
       ),
-      k: (position, rotate, icon, board) => (
+      k: position => (
         <King
-          board={board}
-          icon={icon}
-          rotate={rotate}
+          board={this.state.boardState}
+          icon={Icons[props.isWhite ? 'K' : 'k']}
+          isWhite={props.isWhite}
           onClick={this.highlightPosibleMoves}
           position={position}
         />
       ),
-      q: (position, rotate, icon, board) => (
+      q: position => (
         <Queen
-          board={board}
-          icon={icon}
-          rotate={rotate}
+          board={this.state.boardState}
+          icon={Icons[props.isWhite ? 'Q' : 'q']}
+          isWhite={props.isWhite}
           onClick={this.highlightPosibleMoves}
           position={position}
         />
       ),
-      n: (position, rotate, icon, board) => (
+      n: position => (
         <Knight
-          board={board}
-          icon={icon}
-          rotate={rotate}
+          board={this.state.boardState}
+          icon={Icons[props.isWhite ? 'N' : 'n']}
+          isWhite={props.isWhite}
           onClick={this.highlightPosibleMoves}
           position={position}
         />
       ),
-      b: (position, rotate, icon, board) => (
+      b: position => (
         <Bishop
-          board={board}
-          icon={icon}
-          rotate={rotate}
+          board={this.state.boardState}
+          icon={Icons[props.isWhite ? 'B' : 'b']}
+          isWhite={props.isWhite}
           onClick={this.highlightPosibleMoves}
           position={position}
         />
@@ -87,24 +114,16 @@ class Board extends React.Component {
   }
 
   handleMove(newPosition) {
-    let selectedFigure;
-
     this.setState((prevState) => {
-      const { selected } = prevState;
-      const newBoard = prevState.boardState.filter((field) => {
-        const [figureType, fieldPosition] = field.split('@');
-        if (selected === fieldPosition) {
-          selectedFigure = figureType;
-          return false;
-        }
-        return fieldPosition !== newPosition;
-      });
+      const { selected, boardState } = prevState;
+      const newBoardState = { ...boardState };
+      newBoardState[newPosition] = newBoardState[selected];
+      delete newBoardState[selected];
 
-      newBoard.push(`${selectedFigure}@${newPosition}`);
       return {
         selected: '',
         validMoves: {},
-        boardState: newBoard,
+        boardState: newBoardState,
       };
     });
   }
@@ -121,8 +140,11 @@ class Board extends React.Component {
 
   render() {
     const fields = [];
-    this.state.boardState.forEach((field) => {
-      const [figureType, fieldPosition] = field.split('@');
+    const { isWhite } = this.props;
+    const { boardState } = this.state;
+    const positions = Object.keys(boardState);
+    positions.forEach((fieldPosition) => {
+      const figureType = boardState[fieldPosition];
       let fieldColor;
       if (this.state.selected === fieldPosition) {
         fieldColor = 'rgba(23, 162, 184,.85)';
@@ -136,13 +158,12 @@ class Board extends React.Component {
       j = +j;
       const index = i * 8 + j;
 
-      if ((this.isWhite && figureType.toUpperCase() === figureType)
-       || ((!this.isWhite && figureType.toLowerCase() === figureType))) {
+      if ((isWhite && figureType.toUpperCase() === figureType)
+       || ((!isWhite && figureType.toLowerCase() === figureType))) {
         // my figures
         fields[index] = (
           <BoardField fieldColor={fieldColor} key={`${i}${j}`}>
-            {this.figuresMap[figureType.toLowerCase()](fieldPosition,
-              !this.isWhite, Icons[figureType], this.state.boardState)}
+            {this.figuresMap[figureType.toLowerCase()](fieldPosition)}
           </BoardField>);
       } else {
         let eatFigureHandler;
@@ -152,7 +173,7 @@ class Board extends React.Component {
         }
         fields[index] = (
           <BoardField fieldColor={fieldColor} key={`${i}${j}`}>
-            <Figure rotate={!this.isWhite} icon={Icons[figureType]} onClick={eatFigureHandler} />
+            <Figure isWhite={isWhite} icon={Icons[figureType]} onClick={eatFigureHandler} />
           </BoardField>);
       }
     });
@@ -166,7 +187,6 @@ class Board extends React.Component {
           field = (
             <BoardField fieldColor="rgba(40, 167, 69,.65)" key={position}>
               <Figure onClick={() => this.handleMove(position)} />
-
             </BoardField>
           );
         }
@@ -174,7 +194,7 @@ class Board extends React.Component {
       }
     }
     return (
-      <FiguresGrid rotate={!this.isWhite}>
+      <FiguresGrid rotate={!isWhite}>
         { fields }
       </FiguresGrid>
     );
@@ -182,6 +202,6 @@ class Board extends React.Component {
 }
 
 Board.propTypes = {
-  figure: PropTypes.number,
+  isWhite: PropTypes.bool,
 };
 export default Board;

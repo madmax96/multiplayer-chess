@@ -21,13 +21,13 @@ class Game extends React.Component {
         <MoveHistory />
         <BoardWrapper>
           <BoardLayout />
-          <Board figure={this.props.figure} />
+          <Board isWhite={this.props.isWhite} />
         </BoardWrapper>
       </div>
     );
   }
 }
 Game.propTypes = {
-  figure: PropTypes.number,
+  isWhite: PropTypes.bool,
 };
 export default Game;

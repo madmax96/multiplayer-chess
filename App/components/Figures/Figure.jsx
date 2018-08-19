@@ -12,23 +12,15 @@ const FigureWrap = styled.div`
   cursor:pointer;
   transform:${props => (props.rotate ? 'rotate(180deg)' : '')};
 `;
-class Figure extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { };
-  }
+const Figure = ({ icon, onClick, isWhite }) => (
+  <FigureWrap onClick={onClick} rotate={!isWhite}>
+    <FigureIMG src={icon} alt="" />
+  </FigureWrap>
+);
 
-  render() {
-    return (
-      <FigureWrap onClick={this.props.onClick} rotate={this.props.rotate}>
-        <FigureIMG src={this.props.icon} alt="" />
-      </FigureWrap>
-    );
-  }
-}
 Figure.propTypes = {
   icon: PropTypes.string,
   onClick: PropTypes.func,
-  rotate: PropTypes.bool,
+  isWhite: PropTypes.bool,
 };
 export default Figure;

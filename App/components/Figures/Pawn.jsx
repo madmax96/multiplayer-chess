@@ -3,39 +3,60 @@ import PropTypes from 'prop-types';
 import Figure from './Figure';
 
 
-const Pawn = (props) => {
+const Pawn = ({
+  icon, isWhite, onClick, board, position,
+}) => {
   function pawnHandler() {
-    const { board, position } = props;
     let [i, j] = position;
     i = +i;
     j = +j;
-    const validMoves = {
-      [`${props.rotate ? i + 1 : i - 1}${j}`]: true,
-    };
-    if ((i === 6 && !props.rotate) || (i === 1 && props.rotate)) {
-      validMoves[`${props.rotate ? i + 2 : i - 2}${j}`] = true;
-    }
-
-    props.onClick(validMoves, props.position);
-    board.forEach((field) => {
-      const [figureType, fieldPosition] = field.split('@');
-      if (fieldPosition === `${i - 1}${j - 1}` && figureType !== (props.rotate ? figureType.toLowerCase()
-        : figureType.toUpperCase())) {
+    const validMoves = {};
+    if (isWhite) {
+      if (!board[`${i - 1}${j}`]) {
+        validMoves[`${i - 1}${j}`] = true;
+      }
+      if (!board[`${i - 2}${j}`] && i === 6) {
+        validMoves[`${i - 2}${j}`] = true;
+      }
+      let possibleAttack = board[`${i - 1}${j - 1}`];
+      if (possibleAttack && possibleAttack.toLowerCase() === possibleAttack) {
         validMoves[`${i - 1}${j - 1}`] = true;
       }
-    });
+      possibleAttack = board[`${i - 1}${j + 1}`];
+      if (possibleAttack && possibleAttack.toLowerCase() === possibleAttack) {
+        validMoves[`${i - 1}${j + 1}`] = true;
+      }
+    } else {
+      if (!board[`${i + 1}${j}`]) {
+        validMoves[`${i + 1}${j}`] = true;
+      }
+      if (!board[`${i + 2}${j}`] && i === 1) {
+        validMoves[`${i + 2}${j}`] = true;
+      }
+      let possibleAttack = board[`${i + 1}${j - 1}`];
+      if (possibleAttack && possibleAttack.toUpperCase() === possibleAttack) {
+        validMoves[`${i + 1}${j - 1}`] = true;
+      }
+      possibleAttack = board[`${i + 1}${j + 1}`];
+      if (possibleAttack && possibleAttack.toUpperCase() === possibleAttack) {
+        validMoves[`${i + 1}${j + 1}`] = true;
+      }
+    }
+
+
+    onClick(validMoves, position);
   }
 
   return (
 
-    <Figure rotate={props.rotate} icon={props.icon} onClick={pawnHandler} />
+    <Figure isWhite={isWhite} icon={icon} onClick={pawnHandler} />
 
   );
 };
 
 Pawn.propTypes = {
   icon: PropTypes.string,
-  rotate: PropTypes.bool,
+  isWhite: PropTypes.bool,
   onClick: PropTypes.func,
   position: PropTypes.string,
   board: PropTypes.arrayOf(PropTypes.string),
