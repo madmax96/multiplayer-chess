@@ -42,15 +42,10 @@ const Pawn = ({
         validMoves[`${i + 1}${j + 1}`] = true;
       }
     }
-
-
     onClick(validMoves, position);
   }
-
   return (
-
     <Figure isWhite={isWhite} icon={icon} onClick={pawnHandler} />
-
   );
 };
 

@@ -34,7 +34,7 @@ class App extends React.Component {
     super(props);
 
     this.state = {
-      gameStarted: true,
+      gameStarted: false,
     };
     this.connect = this.connect.bind(this);
   }
@@ -45,8 +45,12 @@ class App extends React.Component {
       this.setState({
         gameStarted: true,
       });
+      this.ws.emmit('start', { name: 'mladen' });
       this.ws.on('ws_close', () => {
         alert('closed');
+      });
+      this.ws.on('gameStart', (data) => {
+        console.log(data);
       });
     }).catch((err) => {
       console.log(err);
@@ -58,7 +62,7 @@ class App extends React.Component {
       <div>
         <FixedBackground />
         {this.state.gameStarted ? (
-          <Game isWhite />
+          <Game isWhite={false} />
         ) : <StartGameForm connect={this.connect} />}
       </div>
     );

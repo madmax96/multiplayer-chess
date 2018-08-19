@@ -130,11 +130,19 @@ class Board extends React.Component {
 
 
   highlightPosibleMoves(validMoves, selected) {
+    let newState = {
+      validMoves,
+      selected,
+    };
+    if (selected === this.state.selected) {
+      newState = {
+        selected: '',
+        validMoves: {},
+
+      };
+    }
     this.setState(
-      {
-        validMoves,
-        selected,
-      },
+      newState,
     );
   }
 

@@ -56,6 +56,7 @@ customEvents.on('surrender', surrenderEvent);
 wss.whitePlayer = null;
 wss.gameRooms = {};
 wss.on('connection', (ws) => {
+  console.log(wss.clients.size);
   ws.isAlive = true;
   ws.on('pong', heartbeat);
   ws.on('message', message => customEvents.eventHandler(message, ws, wss));
