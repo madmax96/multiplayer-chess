@@ -7,8 +7,12 @@ const King = ({
   icon, isWhite, onClick, board, position,
 }) => {
   function KingHandler() {
-    // todo next
+    let [i, j] = position;
+    i = +i;
+    j = +j;
+    const validMoves = {};
   }
+  // test again motherfuckers
 
   return (
 

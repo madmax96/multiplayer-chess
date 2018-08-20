@@ -35,34 +35,40 @@ class App extends React.Component {
 
     this.state = {
       gameStarted: false,
+      gameData: {},
     };
     this.connect = this.connect.bind(this);
   }
 
-  connect(username) {
+  componentWillMount() {
     this.ws = new WS('ws://localhost:3000');
-    this.ws.connect(username).then(() => {
-      this.setState({
-        gameStarted: true,
+    this.ws.connect().then(() => {
+      this.ws.on('gameStart', (gameData) => {
+        if (gameData.figure == 1) {
+          this.ws.emmit('ack', { timestamp: Date.now() });
+        }
+        localStorage.setItem('gameData', JSON.stringify(gameData));
+        this.setState({
+          gameStarted: true,
+          gameData,
+        });
       });
-      this.ws.emmit('start', { name: 'mladen' });
-      this.ws.on('ws_close', () => {
-        alert('closed');
-      });
-      this.ws.on('gameStart', (data) => {
-        console.log(data);
-      });
-    }).catch((err) => {
-      console.log(err);
+    }).catch(() => {
+      alert('Connection to server failed. Please try again later!');
     });
   }
 
+  connect(name) {
+    this.ws.emmit('start', { name });
+  }
+
   render() {
+    const { gameStarted, gameData: { figure, opponentName, roomId } } = this.state;
     return (
       <div>
         <FixedBackground />
-        {this.state.gameStarted ? (
-          <Game isWhite={false} />
+        {gameStarted ? (
+          <Game isWhite={figure == 1} oponentName={opponentName} roomId={roomId} />
         ) : <StartGameForm connect={this.connect} />}
       </div>
     );

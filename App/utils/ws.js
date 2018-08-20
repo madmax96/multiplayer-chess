@@ -19,7 +19,7 @@ export default class WSocket {
         this.socket.onmessage = (message) => {
           const messageData = JSON.parse(message.data);
           const serverEvent = messageData.event;
-          alert(serverEvent);
+          // alert(serverEvent);
           const {
             data,
           } = messageData;
