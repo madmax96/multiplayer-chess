@@ -47,7 +47,7 @@ class App extends React.Component {
         if (gameData.figure == 1) {
           this.ws.emmit('ack', { timestamp: Date.now() });
         }
-        localStorage.setItem('gameData', JSON.stringify(gameData));
+        // localStorage.setItem('gameData', JSON.stringify(gameData));
         this.setState({
           gameStarted: true,
           gameData,
@@ -68,7 +68,7 @@ class App extends React.Component {
       <div>
         <FixedBackground />
         {gameStarted ? (
-          <Game isWhite={figure == 1} oponentName={opponentName} roomId={roomId} />
+          <Game isWhite={figure == 1} oponentName={opponentName} roomId={roomId} socket={this.ws} />
         ) : <StartGameForm connect={this.connect} />}
       </div>
     );

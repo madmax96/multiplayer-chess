@@ -15,6 +15,7 @@ const Centered = styled.div`
   justify-content:center;
   align-items:center;
 `;
+
 const Button = styled.button`
     font-size:20px;
     font-weight:bold;

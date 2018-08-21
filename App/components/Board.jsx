@@ -6,6 +6,7 @@ import {
 
 import { BoardField, FiguresGrid } from './StyledComponents';
 
+
 class Board extends React.Component {
   constructor(props) {
     super(props);
@@ -46,17 +47,20 @@ class Board extends React.Component {
       },
       selected: '',
       validMoves: {},
+      onMove: props.isWhite,
 
     };
+    props.socket.on('move', ({ move }) => this.handleOponentMove(move));
     this.highlightPosibleMoves = this.highlightPosibleMoves.bind(this);
-    this.handleMove = this.handleMove.bind(this);
+    this.handleMyMove = this.handleMyMove.bind(this);
+    this.handleOponentMove = this.handleOponentMove.bind(this);
     this.figuresMap = {
       p: position => (
         <Pawn
           board={this.state.boardState}
           icon={Icons[props.isWhite ? 'P' : 'p']}
           isWhite={props.isWhite}
-          onClick={this.highlightPosibleMoves}
+          onClick={this.state.onMove ? this.highlightPosibleMoves : () => {}}
           position={position}
         />
       ),
@@ -65,7 +69,7 @@ class Board extends React.Component {
           board={this.state.boardState}
           icon={Icons[props.isWhite ? 'R' : 'r']}
           isWhite={props.isWhite}
-          onClick={this.highlightPosibleMoves}
+          onClick={this.state.onMove ? this.highlightPosibleMoves : () => {}}
           position={position}
         />
       ),
@@ -74,7 +78,7 @@ class Board extends React.Component {
           board={this.state.boardState}
           icon={Icons[props.isWhite ? 'K' : 'k']}
           isWhite={props.isWhite}
-          onClick={this.highlightPosibleMoves}
+          onClick={this.state.onMove ? this.highlightPosibleMoves : () => {}}
           position={position}
         />
       ),
@@ -83,7 +87,7 @@ class Board extends React.Component {
           board={this.state.boardState}
           icon={Icons[props.isWhite ? 'Q' : 'q']}
           isWhite={props.isWhite}
-          onClick={this.highlightPosibleMoves}
+          onClick={this.state.onMove ? this.highlightPosibleMoves : () => {}}
           position={position}
         />
       ),
@@ -92,7 +96,7 @@ class Board extends React.Component {
           board={this.state.boardState}
           icon={Icons[props.isWhite ? 'N' : 'n']}
           isWhite={props.isWhite}
-          onClick={this.highlightPosibleMoves}
+          onClick={this.state.onMove ? this.highlightPosibleMoves : () => {}}
           position={position}
         />
       ),
@@ -101,29 +105,53 @@ class Board extends React.Component {
           board={this.state.boardState}
           icon={Icons[props.isWhite ? 'B' : 'b']}
           isWhite={props.isWhite}
-          onClick={this.highlightPosibleMoves}
+          onClick={this.state.onMove ? this.highlightPosibleMoves : () => {}}
           position={position}
         />
       ),
     };
   }
 
+
   onFigureEat(newPositon) {
     // do logic for eating
-    this.handleMove(newPositon);
+    this.handleMyMove(newPositon);
   }
 
-  handleMove(newPosition) {
+  handleOponentMove({ from, to }) {
+    this.setState((prevState) => {
+      const { boardState } = prevState;
+      const newBoardState = { ...boardState };
+      newBoardState[to] = newBoardState[from];
+      delete newBoardState[from];
+
+      return {
+        boardState: newBoardState,
+        onMove: !prevState.onMove,
+      };
+    });
+  }
+
+  handleMyMove(newPosition) {
     this.setState((prevState) => {
       const { selected, boardState } = prevState;
       const newBoardState = { ...boardState };
       newBoardState[newPosition] = newBoardState[selected];
       delete newBoardState[selected];
-
+      this.props.socket.emmit('move',
+        {
+          gameBoard: newBoardState,
+          timestamp: Date.now(),
+          move: {
+            from: selected,
+            to: newPosition,
+          },
+        });
       return {
         selected: '',
         validMoves: {},
         boardState: newBoardState,
+        onMove: !prevState.onMove,
       };
     });
   }
@@ -194,7 +222,7 @@ class Board extends React.Component {
         if (this.state.validMoves[position]) {
           field = (
             <BoardField fieldColor="rgba(40, 167, 69,.65)" key={position}>
-              <Figure onClick={() => this.handleMove(position)} />
+              <Figure onClick={() => this.handleMyMove(position)} />
             </BoardField>
           );
         }
@@ -204,6 +232,7 @@ class Board extends React.Component {
     return (
       <FiguresGrid rotate={!isWhite}>
         { fields }
+
       </FiguresGrid>
     );
   }

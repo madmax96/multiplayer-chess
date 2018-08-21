@@ -7,7 +7,11 @@ class MoveHistory extends React.Component {
   }
 
   render() {
-    return (<div />);
+    return (
+      <div>
+        History
+      </div>
+    );
   }
 }
 

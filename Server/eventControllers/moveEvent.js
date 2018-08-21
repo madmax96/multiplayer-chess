@@ -3,8 +3,8 @@
         timestamp:number,
         gameBoard:json string;
         move:{
-          from:[i,j],
-          to:[k,l]
+          from:"ij",
+          to:"kl"
         }
     }
 */
@@ -24,7 +24,7 @@ module.exports = (data, ws, wss) => {
     room[playerSending].timer = null;
     room.gameBoard = gameBoard;
     room.onMove = sendToPlayer;
-    room[sendToPlayer].socket.send(JSON.stringify({
+    room[sendToPlayer].socket && room[sendToPlayer].socket.send(JSON.stringify({
       event: 'move',
       data: {
         move,
