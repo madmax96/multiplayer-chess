@@ -10,11 +10,21 @@ const InfoContainer = styled.div`
 `;
 
 const GameInfo = ({
-  myTime, opponentTime, myName, opponentName,
+  myTime, opponentTime, myName, opponentName, onMove,
 }) => (
   <InfoContainer className="d-flex flex-column justify-content-between">
-    <UserInfoBox name={opponentName} time={opponentTime} eatenFigures={[]} />
-    <UserInfoBox name={myName} time={myTime} eatenFigures={[]} />
+    <UserInfoBox
+      name={opponentName}
+      time={opponentTime}
+      eatenFigures={[]}
+      isTimerActive={!onMove}
+    />
+    <UserInfoBox
+      name={myName}
+      time={myTime}
+      eatenFigures={[]}
+      isTimerActive={onMove}
+    />
   </InfoContainer>
 );
 
@@ -23,6 +33,7 @@ GameInfo.propTypes = {
   opponentTime: PropTypes.number.isRequired,
   opponentName: PropTypes.string.isRequired,
   myName: PropTypes.string.isRequired,
+  onMove: PropTypes.bool.isRequired,
 };
 
 export default GameInfo;

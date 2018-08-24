@@ -64,6 +64,7 @@ class Game extends React.Component {
   handleMove({
     selected, validMoves, boardState, opponentTime, myTime,
   }) {
+    console.log(opponentTime, myTime);
     this.setState((prevState) => {
       const newState = {
         selected,
@@ -111,6 +112,7 @@ class Game extends React.Component {
             opponentTime={opponentTime}
             opponentName={opponentName}
             myName={myName}
+            onMove={onMove}
           />
         </Col>
       </Row>
