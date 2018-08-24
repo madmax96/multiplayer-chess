@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import WS from '../utils/ws';
 import {
   Figure, Rook, King, Queen, Pawn, Knight, Bishop, Icons,
 } from './Figures/Figures';
@@ -7,238 +8,194 @@ import {
 import { BoardField, FiguresGrid } from './StyledComponents';
 
 
-class Board extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      boardState: {
-        '00': 'r',
-        '01': 'n',
-        '02': 'b',
-        '03': 'q',
-        '04': 'k',
-        '05': 'b',
-        '06': 'n',
-        '07': 'r',
-        '10': 'p',
-        '11': 'p',
-        '12': 'p',
-        '13': 'p',
-        '14': 'p',
-        '15': 'p',
-        '16': 'p',
-        '17': 'p',
-        '60': 'P',
-        '61': 'P',
-        '62': 'P',
-        '63': 'P',
-        '64': 'P',
-        '65': 'P',
-        '66': 'P',
-        '67': 'P',
-        '70': 'R',
-        '71': 'N',
-        '72': 'B',
-        '73': 'Q',
-        '74': 'K',
-        '75': 'B',
-        '76': 'N',
-        '77': 'R',
-      },
+const Board = (props) => {
+  function handleOponentMove({ from, to }, opponentTime, myTime) {
+    props.socket.emmit('ack', { timestamp: Date.now() });
+    const { boardState } = props;
+    const newBoardState = { ...boardState };
+    newBoardState[to] = newBoardState[from];
+    delete newBoardState[from];
+
+    props.handleMove({
       selected: '',
       validMoves: {},
-      onMove: props.isWhite,
-
-    };
-    props.socket.on('move', ({ move }) => this.handleOponentMove(move));
-    this.highlightPosibleMoves = this.highlightPosibleMoves.bind(this);
-    this.handleMyMove = this.handleMyMove.bind(this);
-    this.handleOponentMove = this.handleOponentMove.bind(this);
-    this.figuresMap = {
-      p: position => (
-        <Pawn
-          board={this.state.boardState}
-          icon={Icons[props.isWhite ? 'P' : 'p']}
-          isWhite={props.isWhite}
-          onClick={this.state.onMove ? this.highlightPosibleMoves : () => {}}
-          position={position}
-        />
-      ),
-      r: position => (
-        <Rook
-          board={this.state.boardState}
-          icon={Icons[props.isWhite ? 'R' : 'r']}
-          isWhite={props.isWhite}
-          onClick={this.state.onMove ? this.highlightPosibleMoves : () => {}}
-          position={position}
-        />
-      ),
-      k: position => (
-        <King
-          board={this.state.boardState}
-          icon={Icons[props.isWhite ? 'K' : 'k']}
-          isWhite={props.isWhite}
-          onClick={this.state.onMove ? this.highlightPosibleMoves : () => {}}
-          position={position}
-        />
-      ),
-      q: position => (
-        <Queen
-          board={this.state.boardState}
-          icon={Icons[props.isWhite ? 'Q' : 'q']}
-          isWhite={props.isWhite}
-          onClick={this.state.onMove ? this.highlightPosibleMoves : () => {}}
-          position={position}
-        />
-      ),
-      n: position => (
-        <Knight
-          board={this.state.boardState}
-          icon={Icons[props.isWhite ? 'N' : 'n']}
-          isWhite={props.isWhite}
-          onClick={this.state.onMove ? this.highlightPosibleMoves : () => {}}
-          position={position}
-        />
-      ),
-      b: position => (
-        <Bishop
-          board={this.state.boardState}
-          icon={Icons[props.isWhite ? 'B' : 'b']}
-          isWhite={props.isWhite}
-          onClick={this.state.onMove ? this.highlightPosibleMoves : () => {}}
-          position={position}
-        />
-      ),
-    };
+      boardState: newBoardState,
+      opponentTime,
+      myTime,
+    });
   }
 
-
-  onFigureEat(newPositon) {
+  function handleMyMove(newPosition) {
+    const { selected, boardState } = props;
+    const newBoardState = { ...boardState };
+    newBoardState[newPosition] = newBoardState[selected];
+    delete newBoardState[selected];
+    props.socket.emmit('move',
+      {
+        gameBoard: newBoardState,
+        timestamp: Date.now(),
+        move: {
+          from: selected,
+          to: newPosition,
+        },
+      });
+    props.handleMove({
+      selected: '',
+      validMoves: {},
+      boardState: newBoardState,
+    });
+  }
+  function onFigureEat(newPositon) {
     // do logic for eating
-    this.handleMyMove(newPositon);
+    handleMyMove(newPositon);
   }
 
-  handleOponentMove({ from, to }) {
-    this.setState((prevState) => {
-      const { boardState } = prevState;
-      const newBoardState = { ...boardState };
-      newBoardState[to] = newBoardState[from];
-      delete newBoardState[from];
-
-      return {
-        boardState: newBoardState,
-        onMove: !prevState.onMove,
-      };
-    });
-  }
-
-  handleMyMove(newPosition) {
-    this.setState((prevState) => {
-      const { selected, boardState } = prevState;
-      const newBoardState = { ...boardState };
-      newBoardState[newPosition] = newBoardState[selected];
-      delete newBoardState[selected];
-      this.props.socket.emmit('move',
-        {
-          gameBoard: newBoardState,
-          timestamp: Date.now(),
-          move: {
-            from: selected,
-            to: newPosition,
-          },
-        });
-      return {
-        selected: '',
-        validMoves: {},
-        boardState: newBoardState,
-        onMove: !prevState.onMove,
-      };
-    });
-  }
-
-
-  highlightPosibleMoves(validMoves, selected) {
+  function highlight({ validMoves, selected }) {
     let newState = {
       validMoves,
       selected,
     };
-    if (selected === this.state.selected) {
+    if (selected === props.selected) {
       newState = {
         selected: '',
         validMoves: {},
 
       };
     }
-    this.setState(
-      newState,
-    );
+    props.highlight(newState);
   }
 
-  render() {
-    const fields = [];
-    const { isWhite } = this.props;
-    const { boardState } = this.state;
-    const positions = Object.keys(boardState);
-    positions.forEach((fieldPosition) => {
-      const figureType = boardState[fieldPosition];
-      let fieldColor;
-      if (this.state.selected === fieldPosition) {
-        fieldColor = 'rgba(23, 162, 184,.85)';
-      } else if (this.state.validMoves[fieldPosition]) {
-        fieldColor = 'rgba(40, 167, 69,.65)';
-      } else {
-        fieldColor = 'transparent';
-      }
-      let [i, j] = fieldPosition;
-      i = +i;
-      j = +j;
-      const index = i * 8 + j;
+  props.socket.on('move',
+    ({ move, opponentRemainingTime, myRemainingTime }) => handleOponentMove(move,
+      opponentRemainingTime, myRemainingTime));
 
-      if ((isWhite && figureType.toUpperCase() === figureType)
-       || ((!isWhite && figureType.toLowerCase() === figureType))) {
-        // my figures
-        fields[index] = (
-          <BoardField fieldColor={fieldColor} key={`${i}${j}`}>
-            {this.figuresMap[figureType.toLowerCase()](fieldPosition)}
-          </BoardField>);
-      } else {
-        let eatFigureHandler;
-        if (this.state.validMoves[fieldPosition]) {
-          fieldColor = 'red';
-          eatFigureHandler = () => this.onFigureEat(fieldPosition);
-        }
-        fields[index] = (
-          <BoardField fieldColor={fieldColor} key={`${i}${j}`}>
-            <Figure isWhite={isWhite} icon={Icons[figureType]} onClick={eatFigureHandler} />
-          </BoardField>);
-      }
-    });
+  const figuresMap = {
+    p: position => (
+      <Pawn
+        board={props.boardState}
+        icon={Icons[props.isWhite ? 'P' : 'p']}
+        isWhite={props.isWhite}
+        onClick={props.onMove ? highlight : () => {}}
+        position={position}
+      />
+    ),
+    r: position => (
+      <Rook
+        board={props.boardState}
+        icon={Icons[props.isWhite ? 'R' : 'r']}
+        isWhite={props.isWhite}
+        onClick={props.onMove ? highlight : () => {}}
+        position={position}
+      />
+    ),
+    k: position => (
+      <King
+        board={props.boardState}
+        icon={Icons[props.isWhite ? 'K' : 'k']}
+        isWhite={props.isWhite}
+        onClick={props.onMove ? highlight : () => {}}
+        position={position}
+      />
+    ),
+    q: position => (
+      <Queen
+        board={props.boardState}
+        icon={Icons[props.isWhite ? 'Q' : 'q']}
+        isWhite={props.isWhite}
+        onClick={props.onMove ? highlight : () => {}}
+        position={position}
+      />
+    ),
+    n: position => (
+      <Knight
+        board={props.boardState}
+        icon={Icons[props.isWhite ? 'N' : 'n']}
+        isWhite={props.isWhite}
+        onClick={props.onMove ? highlight : () => {}}
+        position={position}
+      />
+    ),
+    b: position => (
+      <Bishop
+        board={props.boardState}
+        icon={Icons[props.isWhite ? 'B' : 'b']}
+        isWhite={props.isWhite}
+        onClick={props.onMove ? highlight : () => {}}
+        position={position}
+      />
+    ),
+  };
 
-    for (let i = 0; i < 64; i++) {
-      if (fields[i] == null) {
-        // empty fields
-        const position = `${Math.trunc(i / 8)}${i % 8}`;
-        let field = <BoardField key={position} />;
-        if (this.state.validMoves[position]) {
-          field = (
-            <BoardField fieldColor="rgba(40, 167, 69,.65)" key={position}>
-              <Figure onClick={() => this.handleMyMove(position)} />
-            </BoardField>
-          );
-        }
-        fields[i] = field;
-      }
+
+  const fields = [];
+  const { isWhite, boardState } = props;
+  const positions = Object.keys(boardState);
+  positions.forEach((fieldPosition) => {
+    const figureType = boardState[fieldPosition];
+    let fieldColor;
+    if (props.selected === fieldPosition) {
+      fieldColor = 'rgba(23, 162, 184,.85)';
+    } else if (props.validMoves[fieldPosition]) {
+      fieldColor = 'rgba(40, 167, 69,.65)';
+    } else {
+      fieldColor = 'transparent';
     }
-    return (
-      <FiguresGrid rotate={!isWhite}>
-        { fields }
+    let [i, j] = fieldPosition;
+    i = +i;
+    j = +j;
+    const index = i * 8 + j;
 
-      </FiguresGrid>
-    );
+    if ((isWhite && figureType.toUpperCase() === figureType)
+       || ((!isWhite && figureType.toLowerCase() === figureType))) {
+      // my figures
+      fields[index] = (
+        <BoardField fieldColor={fieldColor} key={`${i}${j}`}>
+          {figuresMap[figureType.toLowerCase()](fieldPosition)}
+        </BoardField>);
+    } else {
+      let eatFigureHandler;
+      if (props.validMoves[fieldPosition]) {
+        fieldColor = 'red';
+        eatFigureHandler = () => onFigureEat(fieldPosition);
+      }
+      fields[index] = (
+        <BoardField fieldColor={fieldColor} key={`${i}${j}`}>
+          <Figure isWhite={isWhite} icon={Icons[figureType]} onClick={eatFigureHandler} />
+        </BoardField>);
+    }
+  });
+
+  for (let i = 0; i < 64; i++) {
+    if (fields[i] == null) {
+      // empty fields
+      const position = `${Math.trunc(i / 8)}${i % 8}`;
+      let field = <BoardField key={position} />;
+      if (props.validMoves[position]) {
+        field = (
+          <BoardField fieldColor="rgba(40, 167, 69,.65)" key={position}>
+            <Figure onClick={() => handleMyMove(position)} />
+          </BoardField>
+        );
+      }
+      fields[i] = field;
+    }
   }
-}
+  return (
+    <FiguresGrid rotate={!isWhite}>
+      { fields }
+    </FiguresGrid>
+  );
+};
 
 Board.propTypes = {
-  isWhite: PropTypes.bool,
+  isWhite: PropTypes.bool.isRequired,
+  onMove: PropTypes.bool.isRequired,
+  validMoves: PropTypes.objectOf(PropTypes.bool),
+  highlight: PropTypes.func.isRequired,
+  selected: PropTypes.string,
+  handleMove: PropTypes.func.isRequired,
+  boardState: PropTypes.objectOf(PropTypes.string).isRequired,
+  socket: PropTypes.instanceOf(WS),
+
 };
 export default Board;

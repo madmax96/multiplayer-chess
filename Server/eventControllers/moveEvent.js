@@ -28,7 +28,7 @@ module.exports = (data, ws, wss) => {
       event: 'move',
       data: {
         move,
-        oponentRemainingTime: room[playerSending].timeRemaining, // for synchronisation on frontend
+        opponentRemainingTime: room[playerSending].timeRemaining, // for synchronisation on frontend
         myRemainingTime: room[sendToPlayer].timeRemaining,
       },
     }));

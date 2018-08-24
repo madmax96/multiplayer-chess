@@ -1,32 +1,11 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import PropTypes from 'prop-types';
+import {
+  Row, Button,
+} from 'reactstrap';
 import loader from '../../public/loader.png';
 
-const Centered = styled.div`
-  position: absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  width:30%;
-  height:30vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-`;
-
-const Button = styled.button`
-    font-size:20px;
-    font-weight:bold;
-    color:white;
-    background-color:#28A745;
-    border:none!important;
-    border-radius:5px;
-    padding:5px 25px;
-    margin-top:30px;
-    cursor:pointer;
-`;
 
 const UsernameInput = styled.input`
     background-color:transparent;
@@ -55,10 +34,10 @@ const rotate = keyframes`
 const Rotate = styled.div`
      animation: ${rotate} 1s ease-in-out infinite;
 `;
-const ResponsiveIMG = styled.img`
-    width:100%;
-    height:auto;
-`;
+// const ResponsiveIMG = styled.img`
+//     width:100%;
+//     height:auto;
+// `;
 class StartGame extends React.Component {
   constructor(props) {
     super(props);
@@ -91,20 +70,15 @@ class StartGame extends React.Component {
 
   render() {
     return (
-      <div>
+      <div className="h-100 align-items-center justify-content-center d-flex">
         {this.state.loading
           ? (
-            <Centered>
-              <h1>
-                Waiting for opponent...
-              </h1>
-              <Rotate>
-                <ResponsiveIMG src={loader} alt="loader" />
-              </Rotate>
-            </Centered>
+            <Rotate>
+              <img src={loader} alt="loader" className="img-fluid" />
+            </Rotate>
           )
           : (
-            <Centered>
+            <Row className="flex-column">
               <UsernameInput
                 valid={this.state.isValid}
                 type="text"
@@ -112,10 +86,10 @@ class StartGame extends React.Component {
                 placeholder="Enter your username"
                 onChange={this.handleUsernameInput}
               />
-              <Button onClick={this.handleStartGame}>
+              <Button onClick={this.handleStartGame} color="primary" className="mt-4">
                 Start Game
               </Button>
-            </Centered>
+            </Row>
           )
             }
       </div>

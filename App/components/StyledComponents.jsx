@@ -1,14 +1,5 @@
 import styled from 'styled-components';
 
-const BoardWrapper = styled.div`
-    position: absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    width:600px;
-    height:600px;
-    border:8px solid black;
-`;
 const FiguresGrid = styled.div`
     position: absolute;
     top:0;
@@ -41,5 +32,5 @@ const FigureIMG = styled.img`
 
 
 export {
-  BoardWrapper, BoardField, FiguresGrid, FigureIMG,
+  BoardField, FiguresGrid, FigureIMG,
 };

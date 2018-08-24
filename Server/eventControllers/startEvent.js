@@ -43,7 +43,7 @@ module.exports = (data, ws, wss) => {
       data: {
         figure: 0,
         roomId,
-        oponentName: whitePlayer.name,
+        opponentName: whitePlayer.name,
       },
     }));
 
@@ -52,7 +52,7 @@ module.exports = (data, ws, wss) => {
       data: {
         figure: 1,
         roomId,
-        oponentName: ws.name,
+        opponentName: ws.name,
       },
     }));
     wss.whitePlayer = null;

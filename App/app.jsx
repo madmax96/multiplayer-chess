@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import 'normalize.css/normalize.css';
+import 'bootstrap/dist/css/bootstrap.css';
 import image from '../public/background.jpeg';
 import WS from './utils/ws';
 import StartGameForm from './components/StartGame';
@@ -29,13 +30,17 @@ const FixedBackground = styled.div`
     background-color:rgba(0,0,0,.45);
   }
 `;
+const FullHeight = styled.div`
+  height:100vh;
+  overflow: hidden;
+`;
 class App extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
       gameStarted: false,
-      gameData: {},
+
     };
     this.connect = this.connect.bind(this);
   }
@@ -48,9 +53,9 @@ class App extends React.Component {
           this.ws.emmit('ack', { timestamp: Date.now() });
         }
         // localStorage.setItem('gameData', JSON.stringify(gameData));
+        this.gameData = gameData;
         this.setState({
           gameStarted: true,
-          gameData,
         });
       });
     }).catch(() => {
@@ -59,18 +64,26 @@ class App extends React.Component {
   }
 
   connect(name) {
+    this.myName = name;
     this.ws.emmit('start', { name });
   }
 
   render() {
-    const { gameStarted, gameData: { figure, opponentName, roomId } } = this.state;
+    const { gameStarted } = this.state;
+    const { figure, opponentName, roomId } = this.gameData || {};
     return (
-      <div>
+      <FullHeight>
         <FixedBackground />
         {gameStarted ? (
-          <Game isWhite={figure == 1} oponentName={opponentName} roomId={roomId} socket={this.ws} />
+          <Game
+            isWhite={figure == 1}
+            opponentName={opponentName}
+            myName={this.myName}
+            roomId={roomId}
+            socket={this.ws}
+          />
         ) : <StartGameForm connect={this.connect} />}
-      </div>
+      </FullHeight>
     );
   }
 }
