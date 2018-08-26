@@ -54,13 +54,7 @@ const Rook = ({
           validMoves[`${i}${j + iteration}`] = true;
         }
       }
-
       iteration++;
-
-      if (iteration == 15) {
-        alert(`${front} ${back} ${left} ${right}`);
-        break;
-      }
     }
 
     onClick({ validMoves, selected: position });

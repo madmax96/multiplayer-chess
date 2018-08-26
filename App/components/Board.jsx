@@ -156,7 +156,7 @@ const Board = (props) => {
     } else {
       let eatFigureHandler;
       if (props.validMoves[fieldPosition]) {
-        fieldColor = 'red';
+        fieldColor = 'rgba(220,53,69,.85)';
         eatFigureHandler = () => handleMyMove(fieldPosition);
       }
       fields[index] = (

@@ -14,10 +14,11 @@ const Pawn = ({
     if (isWhite) {
       if (!board[`${i - 1}${j}`]) {
         validMoves[`${i - 1}${j}`] = true;
+        if (!board[`${i - 2}${j}`] && i === 6) {
+          validMoves[`${i - 2}${j}`] = true;
+        }
       }
-      if (!board[`${i - 2}${j}`] && i === 6) {
-        validMoves[`${i - 2}${j}`] = true;
-      }
+
       let possibleAttack = board[`${i - 1}${j - 1}`];
       if (possibleAttack && possibleAttack.toLowerCase() === possibleAttack) {
         validMoves[`${i - 1}${j - 1}`] = true;
@@ -29,10 +30,11 @@ const Pawn = ({
     } else {
       if (!board[`${i + 1}${j}`]) {
         validMoves[`${i + 1}${j}`] = true;
+        if (!board[`${i + 2}${j}`] && i === 1) {
+          validMoves[`${i + 2}${j}`] = true;
+        }
       }
-      if (!board[`${i + 2}${j}`] && i === 1) {
-        validMoves[`${i + 2}${j}`] = true;
-      }
+
       let possibleAttack = board[`${i + 1}${j - 1}`];
       if (possibleAttack && possibleAttack.toUpperCase() === possibleAttack) {
         validMoves[`${i + 1}${j - 1}`] = true;

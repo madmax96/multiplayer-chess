@@ -11,7 +11,6 @@ const Box = styled.div`
     color:${props => (props.white ? '#FFC635' : 'black')};
     display:flex;
     justify-content:space-evenly;
-
 `;
 
 class UserInfoBox extends React.Component {
@@ -78,7 +77,7 @@ class UserInfoBox extends React.Component {
     );
 
     return (
-      <Row>
+      <Row className="align-items-center pl-3">
         {top ? [infoRow, ...eatenFiguresRow] : [...eatenFiguresRow, infoRow] }
       </Row>
 
