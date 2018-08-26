@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Row, Col } from 'reactstrap';
-// import MoveHistory from './MoveHistory';
 import WS from '../utils/ws';
 import BoardLayout from './BoardLayout';
 import Board from './Board';
@@ -13,9 +12,35 @@ const BoardWrapper = styled.div`
   width:600px;
   position:relative;
 `;
+const WinnerMessage = styled.div`
+  width:100%;
+  height:100%;
+  position:absolute;
+  z-index:1000;
+  background-color:rgba(0,0,0,.9);
+  font-weight:bold;
+  text-transform:uppercase;
+  color:white;
+  font-size:22px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+`;
+
 class Game extends React.Component {
   constructor(props) {
     super(props);
+    props.socket.on('timer', () => {
+      this.setState(prevState => ({
+        winner: !prevState.onMove,
+      }));
+    });
+    props.socket.on('opponentGone', () => {
+      this.setState({
+        winner: true,
+      });
+    });
+
     this.state = {
       boardState: {
         '00': 'r',
@@ -58,6 +83,7 @@ class Game extends React.Component {
       onMove: props.isWhite,
       opponentTime: 900000,
       myTime: 900000,
+      winner: null,
     };
     this.highlight = this.highlight.bind(this);
     this.handleMove = this.handleMove.bind(this);
@@ -92,11 +118,24 @@ class Game extends React.Component {
   render() {
     const {
       boardState, selected, validMoves, onMove, opponentTime,
-      myTime, myEatenFigures, opponentEatenFigures,
+      myTime, myEatenFigures, opponentEatenFigures, winner,
     } = this.state;
     const {
       isWhite, socket, opponentName, myName,
     } = this.props;
+    let winnerMessage = null;
+    if (winner !== null) {
+      winnerMessage = winner === true ? (
+        <WinnerMessage>
+          Congratulations! You Won
+        </WinnerMessage>
+      )
+        : (
+          <WinnerMessage>
+            Looser!!! You Lost
+          </WinnerMessage>
+        );
+    }
     return (
       <Row className="h-100 align-items-center justify-content-center">
         <Col md={8} className="h-100 d-flex justify-content-center align-items-center">
@@ -112,7 +151,9 @@ class Game extends React.Component {
               highlight={this.highlight}
               handleMove={this.handleMove}
             />
+            {winnerMessage}
           </BoardWrapper>
+          { winner === null && (
           <GameInfo
             isWhite={isWhite}
             myTime={myTime}
@@ -123,6 +164,7 @@ class Game extends React.Component {
             myEatenFigures={myEatenFigures}
             opponentEatenFigures={opponentEatenFigures}
           />
+          ) }
         </Col>
       </Row>
     );

@@ -79,7 +79,7 @@ wss.on('connection', (ws) => {
       room[player].socket = null;
       if (room[sendTo].socket) {
         room[sendTo].socket.send(JSON.stringify({
-          event: 'oponentGone',
+          event: 'opponentGone',
         }));
         room.reconnectionTimer = setTimeout(() => {
           room[sendTo].socket.send(JSON.stringify({
