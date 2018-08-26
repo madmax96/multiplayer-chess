@@ -10,7 +10,7 @@ const FigureWrap = styled.div`
   justify-content:center;
   align-items:center;
   cursor:pointer;
-  transform:${props => (props.rotate ? 'rotate(180deg)' : '')};
+  transform:${props => (props.rotate ? 'rotate(180deg)' : 'none')};
 `;
 const Figure = ({ icon, onClick, isWhite }) => (
   <FigureWrap onClick={onClick} rotate={!isWhite}>

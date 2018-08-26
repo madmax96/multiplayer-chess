@@ -12,6 +12,7 @@ const Board = (props) => {
   function handleOponentMove({ from, to }, opponentTime, myTime) {
     props.socket.emmit('ack', { timestamp: Date.now() });
     const { boardState } = props;
+    const eaten = boardState[to];
     const newBoardState = { ...boardState };
     newBoardState[to] = newBoardState[from];
     delete newBoardState[from];
@@ -22,11 +23,14 @@ const Board = (props) => {
       boardState: newBoardState,
       opponentTime,
       myTime,
+      eaten,
+      myMove: false,
     });
   }
 
   function handleMyMove(newPosition) {
     const { selected, boardState } = props;
+    const eaten = boardState[newPosition];
     const newBoardState = { ...boardState };
     newBoardState[newPosition] = newBoardState[selected];
     delete newBoardState[selected];
@@ -43,13 +47,10 @@ const Board = (props) => {
       selected: '',
       validMoves: {},
       boardState: newBoardState,
+      eaten,
+      myMove: true,
     });
   }
-  function onFigureEat(newPositon) {
-    // do logic for eating
-    handleMyMove(newPositon);
-  }
-
   function highlight({ validMoves, selected }) {
     let newState = {
       validMoves,
@@ -156,7 +157,7 @@ const Board = (props) => {
       let eatFigureHandler;
       if (props.validMoves[fieldPosition]) {
         fieldColor = 'red';
-        eatFigureHandler = () => onFigureEat(fieldPosition);
+        eatFigureHandler = () => handleMyMove(fieldPosition);
       }
       fields[index] = (
         <BoardField fieldColor={fieldColor} key={`${i}${j}`}>

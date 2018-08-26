@@ -51,6 +51,8 @@ class Game extends React.Component {
         '76': 'N',
         '77': 'R',
       },
+      myEatenFigures: [],
+      opponentEatenFigures: [],
       selected: '',
       validMoves: {},
       onMove: props.isWhite,
@@ -62,9 +64,8 @@ class Game extends React.Component {
   }
 
   handleMove({
-    selected, validMoves, boardState, opponentTime, myTime,
+    selected, validMoves, boardState, opponentTime, myTime, eaten, myMove,
   }) {
-    console.log(opponentTime, myTime);
     this.setState((prevState) => {
       const newState = {
         selected,
@@ -76,6 +77,10 @@ class Game extends React.Component {
         newState.opponentTime = opponentTime;
         newState.myTime = myTime;
       }
+      if (eaten) {
+        myMove ? newState.opponentEatenFigures = [...prevState.opponentEatenFigures, eaten]
+          : newState.myEatenFigures = [...prevState.myEatenFigures, eaten];
+      }
       return newState;
     });
   }
@@ -86,7 +91,8 @@ class Game extends React.Component {
 
   render() {
     const {
-      boardState, selected, validMoves, onMove, opponentTime, myTime,
+      boardState, selected, validMoves, onMove, opponentTime,
+      myTime, myEatenFigures, opponentEatenFigures,
     } = this.state;
     const {
       isWhite, socket, opponentName, myName,
@@ -108,11 +114,14 @@ class Game extends React.Component {
             />
           </BoardWrapper>
           <GameInfo
+            isWhite={isWhite}
             myTime={myTime}
             opponentTime={opponentTime}
             opponentName={opponentName}
             myName={myName}
             onMove={onMove}
+            myEatenFigures={myEatenFigures}
+            opponentEatenFigures={opponentEatenFigures}
           />
         </Col>
       </Row>
