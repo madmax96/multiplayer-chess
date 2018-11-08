@@ -39,7 +39,7 @@ class UserInfoBox extends React.Component {
 
   render() {
     const {
-      name, eatenFigures, isWhite, top,
+      name, eatenFigures, isWhite, top, opponentGone,
     } = this.props;
     const { time, isTimerActive } = this.state;
     if (isTimerActive && !this.intervalId) {
@@ -68,19 +68,23 @@ class UserInfoBox extends React.Component {
           </p>
           <p>
             {minutes}
-      :
+              :
             {seconds}
           </p>
         </Box>
 
       </Col>
     );
-
+    const opponentGoneMessage = opponentGone ? (
+      <div className="d-flex w-100 justify-content-center p-2 text-info font-weight-bold">
+        Opponent  lost connection. Waiting for 1 minute!
+      </div>
+    ) : null;
     return (
       <Row className="align-items-center pl-3">
-        {top ? [infoRow, ...eatenFiguresRow] : [...eatenFiguresRow, infoRow] }
+        {top ? [infoRow, ...eatenFiguresRow, opponentGoneMessage]
+          : [...eatenFiguresRow, infoRow, opponentGoneMessage] }
       </Row>
-
     );
   }
 }
@@ -91,5 +95,6 @@ UserInfoBox.propTypes = {
   eatenFigures: PropTypes.arrayOf(PropTypes.string).isRequired,
   isWhite: PropTypes.bool.isRequired,
   top: PropTypes.bool,
+  opponentGone: PropTypes.bool.isRequired,
 };
 export default UserInfoBox;

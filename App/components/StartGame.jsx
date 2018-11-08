@@ -10,6 +10,7 @@ import loader from '../../public/loader.png';
 const UsernameInput = styled.input`
     background-color:transparent;
     border:none;
+    outline:none;
     border-bottom:3px solid;
     border-bottom-color: ${props => (props.valid ? '#28A745' : '#DC3545')};
     color:white;
@@ -34,10 +35,7 @@ const rotate = keyframes`
 const Rotate = styled.div`
      animation: ${rotate} 1s ease-in-out infinite;
 `;
-// const ResponsiveIMG = styled.img`
-//     width:100%;
-//     height:auto;
-// `;
+
 class StartGame extends React.Component {
   constructor(props) {
     super(props);

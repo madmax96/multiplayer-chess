@@ -73,19 +73,15 @@ wss.on('connection', (ws) => {
         figure,
       } = ws;
       const room = wss.gameRooms[roomId];
+      if (!room) return;
       const player = figure; // player who is closing
       const sendTo = player ? 0 : 1;
-
       room[player].socket = null;
       if (room[sendTo].socket) {
         room[sendTo].socket.send(JSON.stringify({
           event: 'opponentGone',
         }));
         room.reconnectionTimer = setTimeout(() => {
-          room[sendTo].socket.send(JSON.stringify({
-            event: 'winner',
-            data: { winner: sendTo },
-          }));
           if (room[0].timer) {
             clearTimeout(room[0].timer);
           }
@@ -93,6 +89,9 @@ wss.on('connection', (ws) => {
             clearTimeout(room[1].timer);
           }
           delete wss.gameRooms[roomId];
+          room[sendTo].socket.send(JSON.stringify({
+            event: 'winner',
+          }));
         }, 60000);
       } else {
         // if both players disconnect clear all intervals and destroy the game

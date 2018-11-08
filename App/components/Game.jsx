@@ -34,15 +34,27 @@ class Game extends React.Component {
       this.setState(prevState => ({
         winner: !prevState.onMove,
       }));
+      localStorage.setItem('gameData', '');
+    });
+    props.socket.on('winner', () => {
+      this.setState(() => ({
+        winner: true,
+      }));
+      localStorage.setItem('gameData', '');
     });
     props.socket.on('opponentGone', () => {
       this.setState({
-        winner: true,
+        opponentGone: true,
+      });
+    });
+    props.socket.on('oponentReconnected', () => {
+      this.setState({
+        opponentGone: false,
       });
     });
 
     this.state = {
-      boardState: {
+      boardState: props.gameBoard || {
         '00': 'r',
         '01': 'n',
         '02': 'b',
@@ -76,14 +88,15 @@ class Game extends React.Component {
         '76': 'N',
         '77': 'R',
       },
-      myEatenFigures: [],
-      opponentEatenFigures: [],
+      myEatenFigures: props.myEatenFigures || [],
+      opponentEatenFigures: props.opponentEatenFigures || [],
       selected: '',
       validMoves: {},
-      onMove: props.isWhite,
-      opponentTime: 900000,
-      myTime: 900000,
+      onMove: props.onMove,
+      opponentTime: props.opponentRemainingTime || 900000,
+      myTime: props.myRemainingTime || 900000,
       winner: null,
+      opponentGone: false,
     };
     this.highlight = this.highlight.bind(this);
     this.handleMove = this.handleMove.bind(this);
@@ -118,7 +131,7 @@ class Game extends React.Component {
   render() {
     const {
       boardState, selected, validMoves, onMove, opponentTime,
-      myTime, myEatenFigures, opponentEatenFigures, winner,
+      myTime, myEatenFigures, opponentEatenFigures, winner, opponentGone,
     } = this.state;
     const {
       isWhite, socket, opponentName, myName,
@@ -163,6 +176,7 @@ class Game extends React.Component {
             onMove={onMove}
             myEatenFigures={myEatenFigures}
             opponentEatenFigures={opponentEatenFigures}
+            opponentGone={opponentGone}
           />
           ) }
         </Col>
@@ -172,6 +186,12 @@ class Game extends React.Component {
 }
 Game.propTypes = {
   isWhite: PropTypes.bool,
+  onMove: PropTypes.bool,
+  opponentRemainingTime: PropTypes.string,
+  myRemainingTime: PropTypes.string,
+  gameBoard: PropTypes.objectOf(PropTypes.string),
+  myEatenFigures: PropTypes.arrayOf(PropTypes.string),
+  opponentEatenFigures: PropTypes.arrayOf(PropTypes.string),
   socket: PropTypes.instanceOf(WS),
   opponentName: PropTypes.string.isRequired,
   myName: PropTypes.string.isRequired,
