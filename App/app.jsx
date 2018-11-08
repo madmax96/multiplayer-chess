@@ -55,7 +55,9 @@ class App extends React.Component {
         const { figure, roomId } = this.gameData;
         this.ws.emmit('reconnect', { roomId, figure });
       }
-
+      this.ws.on('ws_close', () => {
+        alert('connection closed by server!!!');
+      });
       this.ws.on('gameStart', (gameData) => {
         const onMove = gameData.figure == 1;
         if (onMove) {

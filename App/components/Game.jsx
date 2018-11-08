@@ -187,8 +187,8 @@ class Game extends React.Component {
 Game.propTypes = {
   isWhite: PropTypes.bool,
   onMove: PropTypes.bool,
-  opponentRemainingTime: PropTypes.string,
-  myRemainingTime: PropTypes.string,
+  opponentRemainingTime: PropTypes.number,
+  myRemainingTime: PropTypes.number,
   gameBoard: PropTypes.objectOf(PropTypes.string),
   myEatenFigures: PropTypes.arrayOf(PropTypes.string),
   opponentEatenFigures: PropTypes.arrayOf(PropTypes.string),

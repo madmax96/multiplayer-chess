@@ -56,7 +56,6 @@ Pawn.propTypes = {
   isWhite: PropTypes.bool,
   onClick: PropTypes.func,
   position: PropTypes.string,
-  board: PropTypes.arrayOf(PropTypes.string),
-
+  board: PropTypes.objectOf(PropTypes.string),
 };
 export default Pawn;
